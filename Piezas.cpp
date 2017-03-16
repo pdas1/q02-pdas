@@ -1,5 +1,7 @@
 #include "Piezas.h"
+#include <iostream>
 #include <vector>
+using namespace std;
 /** CLASS Piezas
  * Class for representing a Piezas vertical board, which is roughly based
  * on the game "Connect Four" where pieces are placed in a column and 
@@ -54,22 +56,38 @@ Piece Piezas::switchTurn() {
  * Trying to drop a piece where it cannot be placed loses the player's turn
 **/ 
 Piece Piezas::dropPiece(int column) {
-  Piece ret=Blank;
-  if(board[0][column]!=Blank) {
-     switchTurn();
-     return ret;   
-  }
+  Piece ret=turn;
   if(column>BOARD_COLS-1) {
     switchTurn();
-    ret=Invalid;
+    return Invalid;
   }
-  for(int i=BOARD_ROWS-1; i>=0;i--) {
+  if(board[0][column]!=Blank) {
+     switchTurn();
+     return Blank;   
+  }
+  if(board[2][column]==Blank) {
+    board[2][column]=turn;
+    ret=turn;
+    switchTurn();
+  }
+  else if(board[1][column]==Blank) {
+    board[1][column]=turn;
+    ret=turn;
+    switchTurn();
+  }
+  else if(board[0][column]==Blank) {
+   board[0][column]=turn;
+   ret=turn;
+   switchTurn();
+  }
+
+ /* for(int i=BOARD_ROWS-1;i>=0;i--) {
     if(board[i][column]==Blank) {
       board[i][column]=turn;
       ret=turn;
       switchTurn();
     }
-   }
+   }*/
    return ret;    
 }
 
@@ -151,7 +169,8 @@ Piece Piezas::gameState() {
     return X;
   else if(adjo>adjx)
     return O;
-
+  else
+    return Blank;
   return Blank;
 }  
 
