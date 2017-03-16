@@ -20,14 +20,31 @@
  * Constructor sets an empty board (default 3 rows, 4 columns) and 
  * specifies it is X's turn first
 **/
-Piezas::Piezas();
+Piezas::Piezas() {
+  turn=X;
+  board.resize(BOARD_ROWS, std::vector<Piece>(BOARD_COLS, Blank));
+}
 
 /**
  * Resets each board location to the Blank Piece value, with a board of the
  * same size as previously specified
 **/
-void Piezas::reset();
-
+void Piezas::reset() {
+  for(int i=0;i<BOARD_ROWS;i++) {
+    for(int j=0;j<BOARD_COLS;j++) {
+      board[i][j]=Blank;
+    }
+  }
+}
+Piece Piezas::switchTurn() {
+  if (turn==X) {
+   turn=O;
+  }
+  else {
+   turn=X;
+  }
+  return turn;
+}
 /**
  * Places a piece of the current turn on the board, returns what
  * piece is placed, and toggles which Piece's turn it is. dropPiece does 
@@ -36,13 +53,36 @@ void Piezas::reset();
  * Out of bounds coordinates return the Piece Invalid value
  * Trying to drop a piece where it cannot be placed loses the player's turn
 **/ 
-Piece Piezas::dropPiece(int column);
+Piece Piezas::dropPiece(int column) {
+  Piece ret=Blank;
+  if(board[0][column]!=Blank) {
+     switchTurn();
+     return ret;   
+  }
+  if(column>BOARD_COLS-1) {
+    switchTurn();
+    ret=Invalid;
+  }
+  for(int i=BOARD_ROWS-1; i>=0;i--) {
+    if(board[i][column]==Blank) {
+      board[i][column]=turn;
+      ret=turn;
+      switchTurn();
+    }
+   }
+   return ret;    
+}
 
 /**
  * Returns what piece is at the provided coordinates, or Blank if there
  * are no pieces there, or Invalid if the coordinates are out of bounds
 **/
-Piece Piezas::pieceAt(int row, int column);
+Piece Piezas::pieceAt(int row, int column) {
+  if(row<0 || row>BOARD_ROWS-1 || column<0 || column>BOARD_COLS-1) {
+    return Invalid;
+  }
+    return board[row][column];
+}
 
 /**
  * Returns which Piece has won, if there is a winner, Invalid if the game
@@ -53,4 +93,65 @@ Piece Piezas::pieceAt(int row, int column);
  * or horizontally. If both X's and O's have the same max number of pieces in a
  * line, it is a tie.
 **/
-Piece Piezas::gameState();
+Piece Piezas::gameState() {
+  bool gameTest=true;
+  int countx=0; int counto=0;
+  int adjx=0; int adjo=0;
+  for(int i=0;i<BOARD_ROWS;i++) {
+    for(int j=0;j<BOARD_COLS;j++) {
+      if(board[i][j]==Blank) {
+        gameTest=false;
+      }
+    }
+  }
+  if(gameTest==false) {
+    return Invalid;
+  }
+  for(int i=0;i<BOARD_ROWS;i++)
+  {
+    for(int j=0;j<BOARD_COLS;j++)
+    {
+      if(board[i][j]==O)
+      {
+        counto++;
+        if(counto>adjo) {
+          adjo=counto;
+        }
+        countx=0;
+      }
+      else {
+        countx++;
+        if(countx>adjx)
+          adjx=countx;
+        counto=0;
+      }
+    }
+    countx=0; counto=0;
+  }
+  countx=0; counto=0;
+  for(int j=0;j<BOARD_COLS;j++) {
+    for(int i=0;i<BOARD_ROWS;i++) {
+      if(board[i][j]==O)
+      {
+        counto++;
+        if(counto>adjo)
+          adjo=counto;
+        countx=0;
+      }
+      else {
+        countx++;
+        if(countx>adjx)
+          adjx=countx;
+        counto=0;
+      }
+    }
+    countx=0; counto=0;
+  }
+  if(adjx>adjo)
+    return X;
+  else if(adjo>adjx)
+    return O;
+
+  return Blank;
+}  
+

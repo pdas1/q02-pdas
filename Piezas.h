@@ -39,8 +39,11 @@ class Piezas
      * specifies it is X's turn first
     **/
   	Piezas();
-
-  	/**
+        /**
+         toggle the turn for the players
+        **/
+        Piece switchTurn();
+     	/**
      * Resets each board location to the Blank Piece value, with a board of the
      * same size as previously specified
     **/
